@@ -18,6 +18,11 @@ with open('coinList', 'rb') as filehandle:
     # read the data as binary data stream
     coinList = pickle.load(filehandle)
 
+with open('memeList', 'rb') as filehandle:
+    # read the data as binary data stream
+    memeList = pickle.load(filehandle)
+
+
 # Adds coin to coinList with !add coin
 @bot.command()
 async def addcoin(ctx, coin):
@@ -77,6 +82,7 @@ async def price(ctx, coin):
     await ctx.channel.send("> **"+input+"**" + ": **Price:** `$" + usdPirce + "` | **24 Hour Change:** `%" + dayChange + "` | MOTD: `" + motd[rand] + "`")
 
 
+
 # Gets Coin stats from Coin List
 @bot.command()
 async def update(ctx):
@@ -97,8 +103,24 @@ async def update(ctx):
         dayChange = dayChange[0:5]
         input = input.capitalize()
 
-        await ctx.channel.send("> **"+input+"**" + ": **Price:** `$" + usdPirce + "` | **24 Hour Change:** `%" + dayChange + "`")
+        
+        await ctx.channel.send("> **"+input+"**" + ": **Price:** \t`$" + usdPirce + "` \t| **24 Hour Change:** \t`%" + dayChange + "`")
 
+    rand = random.randrange(len(memeList))
+    await ctx.channel.send(memeList[rand])
 
+@bot.command()
+async def addmeme(ctx, meme):
+    addedmeme = str(meme)
+    if any([str(i) in str(addedmeme) for i in memeList]):
+        await ctx.send("meme is already in list")
+        return
+
+    await ctx.send("adding meme to list!")
+    memeList.append(addedmeme)
+    #Dump Coin to list for persistance past shutdown
+    with open('memeList', 'wb') as filehandle:
+        # store the data as binary data stream
+        pickle.dump(memeList, filehandle)
 
 bot.run(TOKEN)
