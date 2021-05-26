@@ -2,8 +2,10 @@ import os
 import requests
 import random
 import discord
+import pickle
 from dotenv import load_dotenv
 from discord.ext import commands
+
 
 
 
@@ -12,8 +14,11 @@ TOKEN = os.getenv('DISCORD_TOKEN')
 
 bot = commands.Bot(command_prefix="!")
 
-coinList = ['ethereum','bitcoin']
+with open('coinList', 'rb') as filehandle:
+    # read the data as binary data stream
+    coinList = pickle.load(filehandle)
 
+# Adds coin to coinList with !add coin
 @bot.command()
 async def addcoin(ctx, coin):
     coin = coin.lower()
@@ -28,11 +33,17 @@ async def addcoin(ctx, coin):
         coin = coin
         await ctx.send("adding " + coin + " to list!")
         coinList.append(coin)
+        #Dump Coin to list for persistance past shutdown
+        with open('coinList', 'wb') as filehandle:
+            # store the data as binary data stream
+            pickle.dump(coinList, filehandle)
 
+# print the coin list to the channel
 @bot.command()
 async def coins(ctx): 
     await ctx.send(coinList)
 
+# Prints the price of a coin with the MOTD
 @bot.command()
 async def price(ctx, coin):
     input = coin.lower()
@@ -63,7 +74,7 @@ async def price(ctx, coin):
         good = random.randrange(len(goodMotd))
         rand = good
 
-    await ctx.channel.send("> **"+input+"**" + ": **Price:** `$" + usdPirce + "` | **27 Hour Change:** `%" + dayChange + "` | MOTD: `" + motd[rand] + "`")
+    await ctx.channel.send("> **"+input+"**" + ": **Price:** `$" + usdPirce + "` | **24 Hour Change:** `%" + dayChange + "` | MOTD: `" + motd[rand] + "`")
 
 
 # Gets Coin stats from Coin List
