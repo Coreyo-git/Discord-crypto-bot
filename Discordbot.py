@@ -83,6 +83,26 @@ async def price(ctx, coin):
     await ctx.channel.send("> **"+input+"**" + ": **Price:** `$" + usdPirce + "` | **24 Hour Change:** `%" + dayChange + "` | MOTD: `" + motd[rand] + "`")
 
 
+# Tracks Who bought what for what amount
+@bot.command()
+async def buy(ctx, coin, amount, price):
+    await ctx.channel.send(coin + " " + amount + " " + price)
+
+# Tracks sold coins
+@bot.command()
+async def sell(ctx, coin, amount, price):
+    await ctx.channel.send(coin + " " + amount + " " + price)
+
+# Checks active trades
+@bot.command()
+async def trades(ctx):
+    await ctx.channel.send("Will print tradelist")
+
+# clears active trades
+@bot.command()
+async def cleartrades(ctx):
+    await ctx.channel.send("Clearing active trades")
+
 
 # Gets Coin stats from Coin List
 @bot.command()
