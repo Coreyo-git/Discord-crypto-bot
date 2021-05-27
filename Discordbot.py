@@ -19,6 +19,15 @@ with open('coinList', 'rb') as filehandle:
     # read the data as binary data stream
     coinList = pickle.load(filehandle)
 
+# Class for Trades, stored in a list.
+class Trade:
+    def __init__(self, userId, user, coin, amount,price):
+        self.userId = userId
+        self.user = user
+        self.coin = coin
+        self.amount = amount
+        self.price = price
+        
 tradeList = []
 
 #with open('memeList', 'rb') as filehandle:
@@ -101,16 +110,21 @@ async def price(ctx, coin):
 
 # Tracks Who bought what for what amount
 @bot.command()
-async def buy(ctx, coin, amount, price):
+async def buy(ctx, coin, amount, price="0"):
+    # Pulls Author name and stores username
+    user = ctx.message.author 
+    user_name = user.name
+    user_id = user.id
+    #await ctx.channel.send("{} is your name".format(ctx.message.author.mention))
     input, usdPrice, dayChange = request(coin)
     if len(input) != 0:
         if int(price) > 0:
-            tradeList.append(input + amount + price)
-            await ctx.channel.send("Bought: " + input + " | Amount:" + amount + " | for: $" + price)
+            tradeList.append(Trade(user_id, user_name, input, amount, price))
+            await ctx.channel.send(user_name + " | Bought: " + input + " | Amount: " + amount + " | for: $" + price)
         
         else:
-            tradeList.append(input + amount + price)
-            await ctx.channel.send("Bought: " + input + " | Amount:" + amount + " | for: $" + usdPrice)
+            tradeList.append(Trade(user_id, user_name, input, amount, usdPrice))
+            await ctx.channel.send(user_name + " | Bought: " + input + " | Amount:" + amount + " | for: $" + usdPrice)
     
     return
     # await ctx.channel.send(input + usdPrice + dayChange) # test line 
@@ -118,15 +132,37 @@ async def buy(ctx, coin, amount, price):
 
 # Tracks sold coins
 @bot.command()
-async def sell(ctx, coin, amount, price):
-    await ctx.channel.send("Buying: " + coin + " Amount: " + amount + " Price: " + price)
+async def sell(ctx, id):
+
+    user = ctx.message.author 
+    user_name = user.name
+    user_id = user.id
+
+    id = int(id)
+    for index, trade in enumerate(tradeList):
+        if index == id:
+            currentTrade = tradeList[id]
+            if user_name == format(currentTrade.user):
+                await ctx.channel.send("**are you sure you want to sell " + str(id) + "?**  `[Y/N]`")
+                
+                await ctx.channel.send('ID: ' + str(index) + ' | User: **{}** | Coin : **{}** | Amount : **#{}** | Price : **${}**'.format(currentTrade.user, currentTrade.coin, currentTrade.amount,currentTrade.price))
+                #Waites for user choice
+                reply = await bot.wait_for('message', timeout=30)
+                if reply.author == user:
+                    if reply.content == "y" or "Y":
+                        tradeList.pop(id)
+                        await ctx.channel.send("Sold!")
+                    else:
+                        return
+        else:
+            await ctx.channel.send("No ID matches your input, `!sell <ID>`")
 
 # Checks active trades
 @bot.command()
 async def trades(ctx):
     if len(tradeList) > 0:
-        allTrades =''.join(tradeList)
-        await ctx.channel.send(allTrades)
+        for index, trade in enumerate(tradeList):
+            await ctx.channel.send('ID: ' + str(index) + ' | User: **{}** | Coin : **{}** | Amount : **#{}** | Price : **${}**'.format(trade.user, trade.coin, trade.amount,trade.price))
     else:
         await ctx.channel.send("No Active Trades")
 # clears active trades
