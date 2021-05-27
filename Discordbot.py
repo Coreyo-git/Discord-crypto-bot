@@ -1,4 +1,5 @@
 import os
+from discord.embeds import Embed
 import requests
 import random
 import discord
@@ -85,9 +86,9 @@ async def price(ctx, coin):
 
 # Gets Coin stats from Coin List
 @bot.command()
-async def update(ctx):
+async def updates(ctx):
+    updateList = []
     for coin in coinList:
-
         input = str(coin)
         input = input.strip("!")
         input = input.lower()
@@ -102,12 +103,14 @@ async def update(ctx):
         #Formats string for Display
         dayChange = dayChange[0:5]
         input = input.capitalize()
+        respone = "> **"+input+"**" + ": **Price:** \t`$" + usdPirce + "` \t| **24 Hour Change:** \t`%" + dayChange + "`\n"
+        updateList.append(str(respone))
+        #await ctx.channel.send("> **"+input+"**" + ": **Price:** \t`$" + usdPirce + "` \t| **24 Hour Change:** \t`%" + dayChange + "`")
+    updates=''.join(updateList)
+    await ctx.channel.send(updates)
 
-        
-        await ctx.channel.send("> **"+input+"**" + ": **Price:** \t`$" + usdPirce + "` \t| **24 Hour Change:** \t`%" + dayChange + "`")
-
-    rand = random.randrange(len(memeList))
-    await ctx.channel.send(memeList[rand])
+    #rand = random.randrange(len(memeList))
+    #await ctx.channel.send(memeList[rand])
 
 @bot.command()
 async def addmeme(ctx, meme):
