@@ -95,7 +95,7 @@ async def updates(ctx):
 
         #Requests Coin Info
         r = requests.get('https://api.coingecko.com/api/v3/simple/price?ids='+input+'&vs_currencies=usd&include_market_cap=true&include_24hr_vol=true&include_24hr_change=true&include_last_updated_at=true').json()
-        await ctx.channel.send(r)
+        #await ctx.channel.send(r)
         #await message.channel.send(r)
         data = r[input]
         usdPirce = str(data["usd"])
