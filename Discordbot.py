@@ -150,8 +150,23 @@ async def sell(ctx, id):
                 reply = await bot.wait_for('message', timeout=30)
                 if reply.author == user:
                     if reply.content == "y" or "Y":
+                        input, usdPrice, dayChange = request(format(currentTrade.coin))
+                        buyPrice = format(currentTrade.price)
+                        amount = format(currentTrade.amount)
+
+                        now = float(usdPrice)
+                        buy = float(buyPrice)
+                        currentAmount = float(amount)
+
+                        if buy > now: # Not sure about this, tired as :P
+                            difference = buy - now
+                        else:
+                            difference = now - buy
+                        total = difference * currentAmount
+                        diff = str(total)
+
                         tradeList.pop(id)
-                        await ctx.channel.send("Sold!")
+                        await ctx.channel.send("Sold with a difference of: **$" + diff[0:6] + "**")
                     else:
                         return
         else:
