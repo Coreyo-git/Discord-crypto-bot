@@ -19,10 +19,26 @@ with open('coinList', 'rb') as filehandle:
     # read the data as binary data stream
     coinList = pickle.load(filehandle)
 
+tradeList = []
+
 #with open('memeList', 'rb') as filehandle:
 #    # read the data as binary data stream
 #    memeList = pickle.load(filehandle)
 
+# Reusable API Request
+def request(coin):
+    input = str(coin.lower()) # converts to string a removes capitals to satisfy api
+    r = requests.get('https://api.coingecko.com/api/v3/simple/price?ids='+input+'&vs_currencies=usd&include_market_cap=true&include_24hr_vol=true&include_24hr_change=true&include_last_updated_at=true').json()
+
+    data = r[input] # stores API response DATA for Enumeration
+    usdPrice = str(data["usd"]) # Stores USD Price
+    dayChange = str(data["usd_24h_change"]) # Stores % Change
+
+    #Formats string for Display
+    dayChange = dayChange[0:5]
+    input = coin.capitalize()
+
+    return input, usdPrice, dayChange
 
 # Adds coin to coinList with !add coin
 @bot.command()
@@ -86,18 +102,33 @@ async def price(ctx, coin):
 # Tracks Who bought what for what amount
 @bot.command()
 async def buy(ctx, coin, amount, price):
-    await ctx.channel.send(coin + " " + amount + " " + price)
+    input, usdPrice, dayChange = request(coin)
+    if len(input) != 0:
+        if int(price) > 0:
+            tradeList.append(input + amount + price)
+            await ctx.channel.send("Bought: " + input + " | Amount:" + amount + " | for: $" + price)
+        
+        else:
+            tradeList.append(input + amount + price)
+            await ctx.channel.send("Bought: " + input + " | Amount:" + amount + " | for: $" + usdPrice)
+    
+    return
+    # await ctx.channel.send(input + usdPrice + dayChange) # test line 
+    
 
 # Tracks sold coins
 @bot.command()
 async def sell(ctx, coin, amount, price):
-    await ctx.channel.send(coin + " " + amount + " " + price)
+    await ctx.channel.send("Buying: " + coin + " Amount: " + amount + " Price: " + price)
 
 # Checks active trades
 @bot.command()
 async def trades(ctx):
-    await ctx.channel.send("Will print tradelist")
-
+    if len(tradeList) > 0:
+        allTrades =''.join(tradeList)
+        await ctx.channel.send(allTrades)
+    else:
+        await ctx.channel.send("No Active Trades")
 # clears active trades
 @bot.command()
 async def cleartrades(ctx):
