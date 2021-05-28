@@ -166,7 +166,7 @@ async def sell(ctx, id):
                         diff = str(total)
 
                         tradeList.pop(id)
-                        await ctx.channel.send("Sold with a difference of: **$" + diff[0:6] + "**")
+                        await ctx.channel.send("Sold with a difference of: **$" + diff[0:6] + "** | the current price is: **" + usdPrice[0:9] +"**")
                     else:
                         return
         else:
