@@ -195,7 +195,8 @@ async def sell(ctx, id, price="0"):
 async def ttrades(ctx):
     if len(tradeList) > 0:
         for index, trade in enumerate(tradeList):
-            await ctx.channel.send('ID: ' + str(index) + ' | User: **{}** | Coin : **{}** | Amount : **#{}** | Price : **${}**'.format(trade.user, trade.coin, trade.amount,trade.price))
+            input, usdPrice, dayChange = request(format(trade.coin))
+            await ctx.channel.send('ID: ' + str(index) + ' | User: **{}** | Coin : **{}** | Amount : **#{}** |  Buy Price : **${}**'.format(trade.user, trade.coin, trade.amount,trade.price) + ' | Currentl Price: **' + usdPrice + '**')
     else:
         await ctx.channel.send("No Active Trades")
 # clears active trades
