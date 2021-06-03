@@ -132,7 +132,7 @@ async def buy(ctx, coin, amount, price="0"):
 
 # Tracks sold coins
 @bot.command()
-async def sell(ctx, id):
+async def sell(ctx, id, price="0"):
 
     user = ctx.message.author 
     user_name = user.name
@@ -156,6 +156,22 @@ async def sell(ctx, id):
                     buyPrice = format(currentTrade.price)
                     amount = format(currentTrade.amount)
 
+                    if price != "0":
+                        # lazy copy and paste sorry :P 
+                        now = float(price)
+                        buy = float(buyPrice)
+                        currentAmount = float(amount)
+
+                        if buy > now: # Not sure about this, tired as :P
+                            difference = buy - now
+                        else:
+                            difference = now - buy
+                        total = difference * currentAmount
+                        diff = str(total)
+
+                        tradeList.pop(id)
+                        await ctx.channel.send("Sold with a difference of: **$" + diff[0:6] + "** | Bought in at: **$" + str(buyPrice) + "** | the sold price is: **$" + str(now) +"**")
+                        return
                     now = float(usdPrice)
                     buy = float(buyPrice)
                     currentAmount = float(amount)
