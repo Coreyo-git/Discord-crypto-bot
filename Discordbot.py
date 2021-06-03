@@ -118,8 +118,8 @@ async def buy(ctx, coin, amount, price="0"):
     #await ctx.channel.send("{} is your name".format(ctx.message.author.mention))
     input, usdPrice, dayChange = request(coin)
     if len(input) != 0:
-        if int(price) > 0:
-            tradeList.append(Trade(user_id, user_name, input, amount, price))
+        if float(price) > 0:
+            tradeList.append(Trade(user_id, user_name, input, amount, float(price)))
             await ctx.channel.send(user_name + " | Bought: " + input + " | Amount: " + amount + " | for: $" + price)
         
         else:
@@ -141,40 +141,42 @@ async def sell(ctx, id):
     id = int(id)
     for index, trade in enumerate(tradeList):
         if index == id:
-            currentTrade = tradeList[id]
-            if user_name == format(currentTrade.user):
-                await ctx.channel.send("**are you sure you want to sell " + str(id) + "?**  `[Y/N]`")
-                
-                await ctx.channel.send('ID: ' + str(index) + ' | User: **{}** | Coin : **{}** | Amount : **#{}** | Price : **${}**'.format(currentTrade.user, currentTrade.coin, currentTrade.amount,currentTrade.price))
-                #Waites for user choice
-                reply = await bot.wait_for('message', timeout=30)
-                if reply.author == user:
-                    if reply.content == "y" or "Y":
-                        input, usdPrice, dayChange = request(format(currentTrade.coin))
-                        buyPrice = format(currentTrade.price)
-                        amount = format(currentTrade.amount)
+            break
+        currentTrade = tradeList[id]
+        
+        if user_name == format(currentTrade.user):
+            await ctx.channel.send("**are you sure you want to sell " + str(id) + "?**  `[Y/N]`")
+        
+            await ctx.channel.send('ID: ' + str(index) + ' | User: **{}** | Coin : **{}** | Amount : **#{}** | Price : **${}**'.format(currentTrade.user, currentTrade.coin, currentTrade.amount,currentTrade.price))
+            #Waites for user choice
+            reply = await bot.wait_for('message', timeout=30)
+            if reply.author == user:
+                if reply.content == "y" or "Y":
+                    input, usdPrice, dayChange = request(format(currentTrade.coin))
+                    buyPrice = format(currentTrade.price)
+                    amount = format(currentTrade.amount)
 
-                        now = float(usdPrice)
-                        buy = float(buyPrice)
-                        currentAmount = float(amount)
+                    now = float(usdPrice)
+                    buy = float(buyPrice)
+                    currentAmount = float(amount)
 
-                        if buy > now: # Not sure about this, tired as :P
-                            difference = buy - now
-                        else:
-                            difference = now - buy
-                        total = difference * currentAmount
-                        diff = str(total)
-
-                        tradeList.pop(id)
-                        await ctx.channel.send("Sold with a difference of: **$" + diff[0:6] + "** | the current price is: **" + usdPrice[0:9] +"**")
+                    if buy > now: # Not sure about this, tired as :P
+                        difference = buy - now
                     else:
-                        return
+                        difference = now - buy
+                    total = difference * currentAmount
+                    diff = str(total)
+
+                    tradeList.pop(id)
+                    await ctx.channel.send("Sold with a difference of: **$" + diff[0:6] + "** | Bought in at: **$" + str(buyPrice) + "** | the current price is: **$" + usdPrice[0:9] +"**")
+                else:
+                    return
         else:
             await ctx.channel.send("No ID matches your input, `!sell <ID>`")
 
 # Checks active trades
 @bot.command()
-async def trades(ctx):
+async def ttrades(ctx):
     if len(tradeList) > 0:
         for index, trade in enumerate(tradeList):
             await ctx.channel.send('ID: ' + str(index) + ' | User: **{}** | Coin : **{}** | Amount : **#{}** | Price : **${}**'.format(trade.user, trade.coin, trade.amount,trade.price))
