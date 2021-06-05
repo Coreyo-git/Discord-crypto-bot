@@ -40,3 +40,5 @@ API Documentation: [Coin Gecko API](https://www.coingecko.com/en/api#explore-api
 
 `!cleartrades`
 > Clears the active trade list
+
+A few bugs remain as this is a personal project to get farmilliar with python.
