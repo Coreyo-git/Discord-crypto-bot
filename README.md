@@ -1,3 +1,5 @@
+# Deprecated was just a fun project at the time
+
 # Discord-crypto-bot
 ### Simple Discord bot that works with the coingecko public api to request data.
 
